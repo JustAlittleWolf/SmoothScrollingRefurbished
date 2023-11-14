@@ -38,7 +38,7 @@ public abstract class EntryListWidgetMixin {
 
     @Unique
     private void applyMotion(float delta) {
-        velocity *= Math.max(0, 1 - 2 * animationTimer);
+        velocity *= Math.max(0, 1 - 3 * animationTimer);
         scrollAmount += velocity * 0.1d;
         animationTimer += delta * 0.005d;
         if (Math.abs(velocity) < 0.2) velocity = 0;
