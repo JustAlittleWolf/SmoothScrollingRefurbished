@@ -70,21 +70,26 @@ public abstract class EntryListWidgetMixin {
         animationTimer = 0;
     }
 
-    @Redirect(method = "render", at=@At(value="INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
-    private void modifyScrollbar(DrawContext instance, Identifier texture, int x, int y, int width, int height) {
+    @Redirect(method = "render", at=@At(value="INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 1))
+    private void modifyScrollbar(DrawContext instance, int x1, int y1, int x2, int y2, int color) {
+        int height = y2 - y1;
         if(scrollAmount < 0) {
-            height -= dampenSquish(Math.abs(scrollAmount), height);
+            y2 -= dampenSquish(Math.abs(scrollAmount), height);
         }
-        if(y + height > bottom) {
-            y = bottom - height;
+        if(y1 + height > bottom) {
+            y2 = bottom;
+            y1 = bottom - height;
         }
         if (scrollAmount > getMaxScroll()) {
             int squish = dampenSquish(scrollAmount - getMaxScroll(), height);
-            y += squish;
-            height -= squish;
+            y1 += squish;
         }
-        instance.drawGuiTexture(texture, x, y, width, height);
+        instance.fill(x1, y1, x2, y2, color);
+        instance.fill(x1, y1, x2 - 1, y2 - 1, -4144960);
     }
+
+    @Redirect(method = "render", at=@At(value="INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 2))
+    private void cancelScrollbarForeground(DrawContext instance, int x1, int y1, int x2, int y2, int color) {}
 
     @Unique
     private int dampenSquish(double squish, int height) {
