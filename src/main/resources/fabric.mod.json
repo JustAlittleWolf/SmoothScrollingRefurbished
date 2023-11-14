@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "smoothscrollingrefurbished",
 	"version": "${version}",
-	"name": "SmoothScrollingRefurbished",
+	"name": "Smooth Scrolling Refurbished",
 	"description": "Changes ervery scrollbar in the game to scroll smoothly.",
 	"authors": [
 		"JustAlittleWolf"
