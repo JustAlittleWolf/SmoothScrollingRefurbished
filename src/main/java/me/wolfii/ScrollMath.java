@@ -11,6 +11,6 @@ public class ScrollMath {
     }
 
     public static double pushBackStrength(double distance, float delta) {
-        return ((distance + 4d) * delta / 0.3d) / 4.0d;
+        return ((distance + 4d) * delta / 0.3d) / (3.2d/ Config.pushBackStrength);
     }
 }

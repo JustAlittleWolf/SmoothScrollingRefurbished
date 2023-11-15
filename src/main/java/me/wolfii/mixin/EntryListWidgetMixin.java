@@ -55,7 +55,7 @@ public abstract class EntryListWidgetMixin {
     }
 
     @Redirect(method = "mouseScrolled", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/EntryListWidget;setScrollAmount(D)V"))
-    private void setTarget(EntryListWidget<?> instance, double amount) {
+    private void setVelocity(EntryListWidget<?> instance, double amount) {
         double diff = amount - scrollAmount;
         diff *= Config.scrollSpeed;
         if (Math.signum(diff) != Math.signum(scrollStartVelocity)) diff *= 2.5d;
