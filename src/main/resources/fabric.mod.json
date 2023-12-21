@@ -3,7 +3,7 @@
 	"id": "smoothscrollingrefurbished",
 	"version": "${version}",
 	"name": "Smooth Scrolling Refurbished",
-	"description": "Changes ervery scrollbar in the game to scroll smoothly.",
+	"description": "Changes most scrollbars in the game to scroll smoothly.",
 	"authors": [
 		"JustAlittleWolf"
 	],
