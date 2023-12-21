@@ -18,11 +18,7 @@ public abstract class EntryListWidgetMixin {
     @Shadow
     private double scrollAmount;
     @Shadow
-    protected int bottom;
-
-    @Shadow
     public abstract int getMaxScroll();
-
     @Unique
     private double animationTimer = 0;
     @Unique
@@ -30,7 +26,7 @@ public abstract class EntryListWidgetMixin {
     @Unique
     private boolean renderSmooth = false;
 
-    @Inject(method = "render", at = @At("HEAD"))
+    @Inject(method = "renderWidget", at = @At("HEAD"))
     private void manipulateScrollAmount(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         renderSmooth = true;
         checkOutOfBounds(delta);
@@ -72,11 +68,12 @@ public abstract class EntryListWidgetMixin {
         animationTimer = 0;
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
+    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
     private void modifyScrollbar(DrawContext instance, Identifier texture, int x, int y, int width, int height) {
         if (scrollAmount < 0) {
             height -= ScrollMath.dampenSquish(Math.abs(scrollAmount), height);
         }
+        int bottom = ((EntryListWidget<?>) (Object) this).getBottom();
         if (y + height > bottom) {
             y = bottom - height;
         }
