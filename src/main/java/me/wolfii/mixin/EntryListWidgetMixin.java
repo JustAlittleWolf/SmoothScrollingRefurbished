@@ -27,9 +27,12 @@ public abstract class EntryListWidgetMixin {
     private double animationTimer = 0;
     @Unique
     private double scrollStartVelocity = 0;
+    @Unique
+    private boolean renderSmooth = false;
 
     @Inject(method = "render", at = @At("HEAD"))
     private void manipulateScrollAmount(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        renderSmooth = true;
         checkOutOfBounds(delta);
 
         if (Math.abs(ScrollMath.scrollbarVelocity(animationTimer, scrollStartVelocity)) < 1.0) return;
@@ -56,6 +59,10 @@ public abstract class EntryListWidgetMixin {
 
     @Redirect(method = "mouseScrolled", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/EntryListWidget;setScrollAmount(D)V"))
     private void setVelocity(EntryListWidget<?> instance, double amount) {
+        if (!renderSmooth) {
+            instance.setScrollAmount(amount);
+            return;
+        }
         double diff = amount - scrollAmount;
         diff = Math.signum(diff) * Math.min(Math.abs(diff), 10);
         diff *= Config.scrollSpeed;
