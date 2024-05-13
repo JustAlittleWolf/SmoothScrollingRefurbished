@@ -68,7 +68,7 @@ public abstract class EntryListWidgetMixin {
         animationTimer = 0;
     }
 
-    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
+    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V", ordinal = 1))
     private void modifyScrollbar(DrawContext instance, Identifier texture, int x, int y, int width, int height) {
         if (scrollAmount < 0) {
             height -= ScrollMath.dampenSquish(Math.abs(scrollAmount), height);
