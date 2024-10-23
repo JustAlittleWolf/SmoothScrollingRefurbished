@@ -4,6 +4,7 @@ import me.wolfii.Config;
 import me.wolfii.ScrollMath;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.function.Function;
 
 @Mixin(EntryListWidget.class)
 public abstract class EntryListWidgetMixin {
@@ -68,8 +71,8 @@ public abstract class EntryListWidgetMixin {
         animationTimer = 0;
     }
 
-    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V", ordinal = 1))
-    private void modifyScrollbar(DrawContext instance, Identifier texture, int x, int y, int width, int height) {
+    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIII)V", ordinal = 1))
+    private void modifyScrollbar(DrawContext instance, Function<Identifier, RenderLayer> renderLayers, Identifier sprite, int x, int y, int width, int height) {
         if (scrollAmount < 0) {
             height -= ScrollMath.dampenSquish(Math.abs(scrollAmount), height);
         }
@@ -82,6 +85,6 @@ public abstract class EntryListWidgetMixin {
             y += squish;
             height -= squish;
         }
-        instance.drawGuiTexture(texture, x, y, width, height);
+        instance.drawGuiTexture(renderLayers, sprite, x, y, width, height);
     }
 }
