@@ -20,7 +20,12 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.15.0",
-		"minecraft": "~1.21.2",
+		"minecraft": "~1.21.4",
 		"java": ">=21"
+	},
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/client/gui/widget/ScrollableWidget": ["me/wolfii/ScrollableWidgetManipulator"]
+		}
 	}
 }
