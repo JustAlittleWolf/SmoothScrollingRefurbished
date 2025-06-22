@@ -1,19 +1,17 @@
 package me.wolfii.mixin;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import me.wolfii.Config;
 import me.wolfii.ScrollMath;
 import me.wolfii.ScrollableWidgetManipulator;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ScrollableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.function.Function;
 
 @Mixin(ScrollableWidget.class)
 public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulator {
@@ -57,7 +55,13 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
         }
     }
 
-    @Redirect(method = "mouseScrolled", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/ScrollableWidget;setScrollY(D)V"))
+    @Redirect(
+        method = "mouseScrolled",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/widget/ScrollableWidget;setScrollY(D)V"
+        )
+    )
     private void setVelocity(ScrollableWidget instance, double scrollY) {
         if (!renderSmooth) {
             instance.setScrollY(scrollY);
@@ -72,10 +76,17 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
         animationTimer = 0;
     }
 
-    @Redirect(method = "drawScrollbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIII)V", ordinal = 1))
-    private void modifyScrollbar(DrawContext instance, Function<Identifier, RenderLayer> renderLayers, Identifier sprite, int x, int y, int width, int height) {
+    @Redirect(
+        method = "drawScrollbar",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIII)V",
+            ordinal = 1
+        )
+    )
+    private void modifyScrollbar(DrawContext instance, RenderPipeline pipeline, Identifier sprite, int x, int y, int width, int height) {
         if (!renderSmooth) {
-            instance.drawGuiTexture(renderLayers, sprite, x, y, width, height);
+            instance.drawGuiTexture(pipeline, sprite, x, y, width, height);
             return;
         }
         if (scrollY < 0) {
@@ -90,6 +101,6 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
             y += squish;
             height -= squish;
         }
-        instance.drawGuiTexture(renderLayers, sprite, x, y, width, height);
+        instance.drawGuiTexture(pipeline, sprite, x, y, width, height);
     }
 }

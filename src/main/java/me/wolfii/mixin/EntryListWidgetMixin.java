@@ -10,7 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntryListWidget.class)
 public class EntryListWidgetMixin {
-    @Inject(method = "renderWidget", at=@At("HEAD"))
+    @Inject(
+        method = "renderWidget",
+        at = @At("HEAD")
+    )
     private void manipulateScrollAmount(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         ((ScrollableWidget) (Object) this).smoothScrollingRefurbished$manipulateScrollAmount(delta);
     }
