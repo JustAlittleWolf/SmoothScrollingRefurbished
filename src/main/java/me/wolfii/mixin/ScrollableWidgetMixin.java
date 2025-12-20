@@ -1,5 +1,6 @@
 package me.wolfii.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -14,8 +15,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractScrollArea.class)
 public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulator {
@@ -71,7 +70,7 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
     )
     private void setVelocity(AbstractScrollArea instance, double scrollY, Operation<Void> original) {
         if (!renderSmooth) {
-			original.call(instance, scrollY);
+            original.call(instance, scrollY);
             return;
         }
         double diff = scrollY - this.scrollAmount;
@@ -108,7 +107,7 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
             y += squish;
             height -= squish;
         }
-		original.call(instance, pipeline, sprite, x, y, width, height);
+        original.call(instance, pipeline, sprite, x, y, width, height);
     }
 
     @WrapOperation(
@@ -123,11 +122,9 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
         original.call(instance, Mth.clamp(scrollY, 0.0, this.maxScrollAmount()));
     }
 
-    @Inject(
-        method = "setScrollAmount",
-        at = @At("TAIL")
-    )
-    private void setScrollYUnclamped(double scrollY, CallbackInfo ci) {
-        this.scrollAmount = scrollY;
+    @WrapMethod(method = "setScrollAmount")
+    private void setScrollYUnclamped(double scrollY, Operation<Void> original) {
+        if (scrollY > maxScrollAmount() + 1e5 || scrollY < -1e5) original.call(scrollY);
+        else this.scrollAmount = scrollY;
     }
 }
