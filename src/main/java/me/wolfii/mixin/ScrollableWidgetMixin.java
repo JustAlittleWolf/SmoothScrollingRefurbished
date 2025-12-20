@@ -6,10 +6,10 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import me.wolfii.Config;
 import me.wolfii.ScrollMath;
 import me.wolfii.ScrollableWidgetManipulator;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.ScrollableWidget;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractScrollArea;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -17,16 +17,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ScrollableWidget.class)
+@Mixin(AbstractScrollArea.class)
 public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulator {
     @Shadow
-    private double scrollY;
+    private double scrollAmount;
 
     @Shadow
-    public abstract int getMaxScrollY();
+    public abstract int maxScrollAmount();
 
     @Shadow
-    public abstract void setScrollY(double scrollY);
+    public abstract void setScrollAmount(double scrollY);
 
     @Unique
     private double animationTimer = 0;
@@ -46,19 +46,19 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
 
     @Unique
     private void applyMotion(float delta) {
-        setScrollY(scrollY + ScrollMath.scrollbarVelocity(animationTimer, scrollStartVelocity) * delta);
+        setScrollAmount(scrollAmount + ScrollMath.scrollbarVelocity(animationTimer, scrollStartVelocity) * delta);
         animationTimer += delta * 10 / Config.animationDuration;
     }
 
     @Unique
     private void checkOutOfBounds(float delta) {
-        if (scrollY < 0) {
-            setScrollY(scrollY + ScrollMath.pushBackStrength(Math.abs(scrollY), delta));
-            if (scrollY > -0.2) scrollY = 0;
+        if (scrollAmount < 0) {
+            setScrollAmount(scrollAmount + ScrollMath.pushBackStrength(Math.abs(scrollAmount), delta));
+            if (scrollAmount > -0.2) scrollAmount = 0;
         }
-        if (scrollY > getMaxScrollY()) {
-            setScrollY(scrollY - ScrollMath.pushBackStrength(scrollY - getMaxScrollY(), delta));
-            if (scrollY < getMaxScrollY() + 0.2) scrollY = getMaxScrollY();
+        if (scrollAmount > maxScrollAmount()) {
+            setScrollAmount(scrollAmount - ScrollMath.pushBackStrength(scrollAmount - maxScrollAmount(), delta));
+            if (scrollAmount < maxScrollAmount() + 0.2) scrollAmount = maxScrollAmount();
         }
     }
 
@@ -66,15 +66,15 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
         method = "mouseScrolled",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/widget/ScrollableWidget;setScrollY(D)V"
+            target = "Lnet/minecraft/client/gui/components/AbstractScrollArea;setScrollAmount(D)V"
         )
     )
-    private void setVelocity(ScrollableWidget instance, double scrollY, Operation<Void> original) {
+    private void setVelocity(AbstractScrollArea instance, double scrollY, Operation<Void> original) {
         if (!renderSmooth) {
-            instance.setScrollY(scrollY);
+			original.call(instance, scrollY);
             return;
         }
-        double diff = scrollY - this.scrollY;
+        double diff = scrollY - this.scrollAmount;
         diff = Math.signum(diff) * Math.min(Math.abs(diff), 10);
         diff *= Config.scrollSpeed;
         if (Math.signum(diff) != Math.signum(scrollStartVelocity)) diff *= 2.5d;
@@ -84,50 +84,50 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
     }
 
     @WrapOperation(
-        method = "drawScrollbar",
+        method = "renderScrollbar",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIII)V",
+            target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V",
             ordinal = 1
         )
     )
-    private void modifyScrollbar(DrawContext instance, RenderPipeline pipeline, Identifier sprite, int x, int y, int width, int height, Operation<Void> original) {
+    private void modifyScrollbar(GuiGraphics instance, RenderPipeline pipeline, ResourceLocation sprite, int x, int y, int width, int height, Operation<Void> original) {
         if (!renderSmooth) {
-            instance.drawGuiTexture(pipeline, sprite, x, y, width, height);
+            instance.blitSprite(pipeline, sprite, x, y, width, height);
             return;
         }
-        if (scrollY < 0) {
-            height -= ScrollMath.dampenSquish(Math.abs(scrollY), height);
+        if (scrollAmount < 0) {
+            height -= ScrollMath.dampenSquish(Math.abs(scrollAmount), height);
         }
-        int bottom = ((ScrollableWidget) (Object) this).getBottom();
+        int bottom = ((AbstractScrollArea) (Object) this).getBottom();
         if (y + height > bottom) {
             y = bottom - height;
         }
-        if (scrollY > getMaxScrollY()) {
-            int squish = ScrollMath.dampenSquish(scrollY - getMaxScrollY(), height);
+        if (scrollAmount > maxScrollAmount()) {
+            int squish = ScrollMath.dampenSquish(scrollAmount - maxScrollAmount(), height);
             y += squish;
             height -= squish;
         }
-        instance.drawGuiTexture(pipeline, sprite, x, y, width, height);
+		original.call(instance, pipeline, sprite, x, y, width, height);
     }
 
     @WrapOperation(
         method = "mouseDragged",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/widget/ScrollableWidget;setScrollY(D)V",
+            target = "Lnet/minecraft/client/gui/components/AbstractScrollArea;setScrollAmount(D)V",
             ordinal = 2
         )
     )
-    private void clampDraggedScrollY(ScrollableWidget instance, double scrollY, Operation<Void> original) {
-        original.call(instance, MathHelper.clamp(scrollY, 0.0, this.getMaxScrollY()));
+    private void clampDraggedScrollY(AbstractScrollArea instance, double scrollY, Operation<Void> original) {
+        original.call(instance, Mth.clamp(scrollY, 0.0, this.maxScrollAmount()));
     }
 
     @Inject(
-        method = "setScrollY",
+        method = "setScrollAmount",
         at = @At("TAIL")
     )
     private void setScrollYUnclamped(double scrollY, CallbackInfo ci) {
-        this.scrollY = scrollY;
+        this.scrollAmount = scrollY;
     }
 }

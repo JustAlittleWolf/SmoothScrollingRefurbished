@@ -25,7 +25,7 @@
 	},
 	"custom": {
 		"loom:injected_interfaces": {
-			"net/minecraft/client/gui/widget/ScrollableWidget": ["me/wolfii/ScrollableWidgetManipulator"]
+			"net/minecraft/client/gui/components/AbstractScrollArea": ["me/wolfii/ScrollableWidgetManipulator"]
 		}
 	}
 }
