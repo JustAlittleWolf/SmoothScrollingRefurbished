@@ -7,9 +7,9 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import me.wolfii.Config;
 import me.wolfii.ScrollMath;
 import me.wolfii.ScrollableWidgetManipulator;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractScrollArea;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -83,16 +83,16 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
     }
 
     @WrapOperation(
-        method = "renderScrollbar",
+        method = "extractScrollbar",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V",
-            ordinal = 1
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lnet/minecraft/client/renderer/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V",
+            ordinal = 3
         )
     )
-    private void modifyScrollbar(GuiGraphics instance, RenderPipeline pipeline, ResourceLocation sprite, int x, int y, int width, int height, Operation<Void> original) {
+    private void modifyScrollbar(GuiGraphicsExtractor instance, RenderPipeline pipeline, Identifier sprite, int x, int y, int width, int height, Operation<Void> original) {
         if (!renderSmooth) {
-            instance.blitSprite(pipeline, sprite, x, y, width, height);
+            original.call(pipeline, sprite, x, y, width, height);
             return;
         }
         if (scrollAmount < 0) {

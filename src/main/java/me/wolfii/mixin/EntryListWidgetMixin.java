@@ -1,6 +1,6 @@
 package me.wolfii.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractScrollArea;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +14,7 @@ public class EntryListWidgetMixin {
         method = "renderWidget",
         at = @At("HEAD")
     )
-    private void manipulateScrollAmount(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void manipulateScrollAmount(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         ((AbstractScrollArea) (Object) this).smoothScrollingRefurbished$manipulateScrollAmount(delta);
     }
 }
