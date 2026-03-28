@@ -86,13 +86,13 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
         method = "extractScrollbar",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lnet/minecraft/client/renderer/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V",
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V",
             ordinal = 3
         )
     )
     private void modifyScrollbar(GuiGraphicsExtractor instance, RenderPipeline pipeline, Identifier sprite, int x, int y, int width, int height, Operation<Void> original) {
         if (!renderSmooth) {
-            original.call(pipeline, sprite, x, y, width, height);
+            original.call(instance, pipeline, sprite, x, y, width, height);
             return;
         }
         if (scrollAmount < 0) {

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractSelectionList.class)
 public class EntryListWidgetMixin {
     @Inject(
-        method = "renderWidget",
+        method = "extractWidgetRenderState",
         at = @At("HEAD")
     )
     private void manipulateScrollAmount(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
