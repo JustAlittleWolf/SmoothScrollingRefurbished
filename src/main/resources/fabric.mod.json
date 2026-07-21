@@ -19,7 +19,7 @@
 		"smoothscrollingrefurbished.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.18.0",
-		"minecraft": ">=26.1"
+		"fabricloader": ">=0.19.0",
+		"minecraft": ">=${minecraft_version}"
 	}
 }
