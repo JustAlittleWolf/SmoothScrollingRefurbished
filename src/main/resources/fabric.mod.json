@@ -21,10 +21,5 @@
 	"depends": {
 		"fabricloader": ">=0.18.0",
 		"minecraft": ">=26.1"
-	},
-	"custom": {
-		"loom:injected_interfaces": {
-			"net/minecraft/client/gui/components/AbstractScrollArea": ["me/wolfii/ScrollableWidgetManipulator"]
-		}
 	}
 }

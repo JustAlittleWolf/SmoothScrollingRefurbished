@@ -6,7 +6,6 @@
 		"defaultRequire": 1
 	},
 	"client": [
-		"EntryListWidgetMixin",
-		"ScrollableWidgetMixin"
+      "AbstractScrollAreaMixin"
 	]
 }
