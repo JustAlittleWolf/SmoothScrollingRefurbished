@@ -3,7 +3,7 @@ package me.wolfii.mixin;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import me.wolfii.Config;
 import me.wolfii.ScrollMath;
-import me.wolfii.ScrollableWidgetManipulator;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ScrollableWidget;
 import net.minecraft.util.Identifier;
@@ -11,15 +11,20 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ScrollableWidget.class)
-public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulator {
+public abstract class ScrollableWidgetMixin {
     @Shadow
     private double scrollY;
 
     @Shadow
     public abstract int getMaxScrollY();
+
+    @Shadow
+    protected abstract boolean overflows();
 
     @Unique
     private double animationTimer = 0;
@@ -27,15 +32,6 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
     private double scrollStartVelocity = 0;
     @Unique
     private boolean renderSmooth = false;
-
-    @Unique
-    public void smoothScrollingRefurbished$manipulateScrollAmount(float delta) {
-        renderSmooth = true;
-        checkOutOfBounds(delta);
-
-        if (Math.abs(ScrollMath.scrollbarVelocity(animationTimer, scrollStartVelocity)) < 1.0) return;
-        applyMotion(delta);
-    }
 
     @Unique
     private void applyMotion(float delta) {
@@ -53,6 +49,22 @@ public abstract class ScrollableWidgetMixin implements ScrollableWidgetManipulat
             scrollY -= ScrollMath.pushBackStrength(scrollY - getMaxScrollY(), delta);
             if (scrollY < getMaxScrollY() + 0.2) scrollY = getMaxScrollY();
         }
+    }
+
+    @Inject(
+        method = "drawScrollbar",
+        at = @At("TAIL")
+    )
+    private void manipulateScrollAmount(DrawContext context, CallbackInfo ci) {
+        renderSmooth = overflows();
+        if (!renderSmooth) {
+            return;
+        }
+        float delta = MinecraftClient.getInstance().getRenderTickCounter().getFixedDeltaTicks();
+        checkOutOfBounds(delta);
+
+        if (Math.abs(ScrollMath.scrollbarVelocity(animationTimer, scrollStartVelocity)) < 1.0) return;
+        applyMotion(delta);
     }
 
     @Redirect(

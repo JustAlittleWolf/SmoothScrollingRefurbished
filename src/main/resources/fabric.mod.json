@@ -22,10 +22,5 @@
 		"fabricloader": ">=0.16.0",
 		"minecraft": "~${minecraft_version}",
 		"java": ">=21"
-	},
-	"custom": {
-		"loom:injected_interfaces": {
-			"net/minecraft/client/gui/widget/ScrollableWidget": ["me/wolfii/ScrollableWidgetManipulator"]
-		}
 	}
 }
