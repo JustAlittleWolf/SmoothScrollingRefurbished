@@ -1,25 +1,35 @@
 {
-	"schemaVersion": 1,
-	"id": "smoothscrollingrefurbished",
-	"version": "${version}",
-	"name": "Smooth Scrolling Refurbished",
-	"description": "Changes most scrollbars in the game to scroll smoothly.",
-	"authors": [
-		"JustAlittleWolf"
-	],
-	"contact": {
-		"sources": "https://github.com/JustAlittleWolf/SmoothScrollingRefurbished",
-		"issues": "https://github.com/JustAlittleWolf/SmoothScrollingRefurbished/issues"
-	},
-	"license": "MIT",
-	"icon": "icon.png",
-	"environment": "client",
-	"entrypoints": {},
-	"mixins": [
-		"smoothscrollingrefurbished.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.19.0",
-		"minecraft": ">=${minecraft_version}"
-	}
+  "schemaVersion": 1,
+  "id": "smoothscrollingrefurbished",
+  "version": "${version}",
+  "name": "Smooth Scrolling Refurbished",
+  "description": "Changes most scrollbars in the game to scroll smoothly.",
+  "authors": [
+    "JustAlittleWolf"
+  ],
+  "contact": {
+    "sources": "https://github.com/JustAlittleWolf/SmoothScrollingRefurbished",
+    "issues": "https://github.com/JustAlittleWolf/SmoothScrollingRefurbished/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/smoothscrollingrefurbished/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "me.wolfii.smoothscrollingrefurbished.SmoothScrollingRefurbishedClient"
+    ],
+    "modmenu": [
+      "me.wolfii.smoothscrollingrefurbished.config.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "smoothscrollingrefurbished.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": ">=${minecraft_version}"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
 }

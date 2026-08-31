@@ -14,11 +14,18 @@ repositories {
         name = "Modrinth"
         url = "https://api.modrinth.com/maven"
     }
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+    //runtimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 processResources {

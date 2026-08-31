@@ -1,11 +1,11 @@
-package me.wolfii.mixin;
+package me.wolfii.smoothscrollingrefurbished.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import me.wolfii.Config;
-import me.wolfii.ScrollMath;
+import me.wolfii.smoothscrollingrefurbished.ScrollMath;
+import me.wolfii.smoothscrollingrefurbished.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractScrollArea;
@@ -20,6 +20,12 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class AbstractScrollAreaMixin {
     @Shadow
     private double scrollAmount;
+    @Unique
+    private double animationTimer = 0;
+    @Unique
+    private double scrollStartVelocity = 0;
+    @Unique
+    private boolean renderSmooth = false;
 
     @Shadow
     public abstract int maxScrollAmount();
@@ -31,16 +37,9 @@ public abstract class AbstractScrollAreaMixin {
     protected abstract boolean scrollable();
 
     @Unique
-    private double animationTimer = 0;
-    @Unique
-    private double scrollStartVelocity = 0;
-    @Unique
-    private boolean renderSmooth = false;
-
-    @Unique
     private void applyMotion(float delta) {
         this.setScrollAmount(this.scrollAmount + ScrollMath.scrollbarVelocity(this.animationTimer, this.scrollStartVelocity) * delta);
-        this.animationTimer += delta * 10 / Config.animationDuration;
+        this.animationTimer += delta * 10;
     }
 
     @Unique
@@ -86,7 +85,7 @@ public abstract class AbstractScrollAreaMixin {
         }
         double diff = scrollY - this.scrollAmount;
         diff = Math.signum(diff) * Math.min(Math.abs(diff), 10);
-        diff *= Config.scrollSpeed;
+        diff *= Config.INSTANCE.scrollStrength;
         if (Math.signum(diff) != Math.signum(this.scrollStartVelocity)) diff *= 2.5d;
         this.animationTimer *= 0.5;
         this.scrollStartVelocity = ScrollMath.scrollbarVelocity(this.animationTimer, this.scrollStartVelocity) + diff;
@@ -140,6 +139,14 @@ public abstract class AbstractScrollAreaMixin {
     @WrapMethod(method = "setScrollAmount")
     private void setScrollYUnclamped(double scrollAmount, Operation<Void> original) {
         if (!this.renderSmooth || scrollAmount > this.maxScrollAmount() + 1e5 || scrollAmount < -1e5) {
+            original.call(scrollAmount);
+            return;
+        }
+        if (Config.INSTANCE.isPushbackDisabled()) {
+            if (scrollAmount < 0 || scrollAmount > this.maxScrollAmount()) {
+                this.scrollStartVelocity = 0;
+                this.animationTimer = 0;
+            }
             original.call(scrollAmount);
             return;
         }

@@ -1,0 +1,10 @@
+{
+  "smoothscrollingrefurbished.config.title": "Smooth Scrolling Refurbished",
+  "smoothscrollingrefurbished.options.scrolltest": "Scroll meee",
+  "smoothscrollingrefurbished.option.scrollStrength": "Scroll Strength",
+  "smoothscrollingrefurbished.option.scrollStrength.tooltip": "How much scrolling moves the scrollbar\nHigher values makes scrolling faster",
+  "smoothscrollingrefurbished.option.scrollbarFriction": "Scrollbar Friction",
+  "smoothscrollingrefurbished.option.scrollbarFriction.tooltip": "How fast the scrollbar will come to a stop\nHigher values make the scrollbar stop faster",
+  "smoothscrollingrefurbished.option.pushBackStrength": "Pushback Strength",
+  "smoothscrollingrefurbished.option.pushBackStrength.tooltip": "How strong the scrollbar will be pushed back when going beyond the top or bottom\nHigher values make the scrollbar bounce less\n\nSet to MAX to disable"
+}

@@ -1,8 +1,10 @@
-package me.wolfii;
+package me.wolfii.smoothscrollingrefurbished;
+
+import me.wolfii.smoothscrollingrefurbished.config.Config;
 
 public class ScrollMath {
     public static double scrollbarVelocity(double timer, double factor) {
-        return Math.pow(1 - Config.scrollbarDrag, timer) * factor;
+        return Math.pow(1 - Config.INSTANCE.scrollbarFriction, timer) * factor;
     }
 
     public static int dampenSquish(double squish, int height) {
@@ -11,6 +13,6 @@ public class ScrollMath {
     }
 
     public static double pushBackStrength(double distance, float delta) {
-        return ((distance + 4d) * delta / 0.3d) / (3.2d / Config.pushBackStrength);
+        return ((distance + 4d) * delta / 0.3d) / (3.2d / Config.INSTANCE.pushBackStrength);
     }
 }
