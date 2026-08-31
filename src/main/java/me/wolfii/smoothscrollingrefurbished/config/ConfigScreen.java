@@ -72,7 +72,7 @@ public class ConfigScreen extends OptionsSubScreen {
         return new OptionInstance[]{
             doubleSliderOption(
                 "smoothscrollingrefurbished.option.scrollStrength",
-                0.25,
+                0.1,
                 2.5,
                 Config.INSTANCE.scrollStrength,
                 2,
