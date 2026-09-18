@@ -3,7 +3,7 @@ package me.wolfii.smoothscrollingrefurbished.mixin;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import me.wolfii.smoothscrollingrefurbished.ScrollMath;
 import me.wolfii.smoothscrollingrefurbished.config.Config;
 import net.minecraft.client.Minecraft;
@@ -78,12 +78,12 @@ public abstract class AbstractScrollAreaMixin {
             target = "Lnet/minecraft/client/gui/components/AbstractScrollArea;setScrollAmount(D)V"
         )
     )
-    private void setVelocity(AbstractScrollArea instance, double scrollY, Operation<Void> original) {
+    private void setVelocity(AbstractScrollArea instance, double scrollAmount, Operation<Void> original) {
         if (!this.renderSmooth) {
-            original.call(instance, scrollY);
+            original.call(instance, scrollAmount);
             return;
         }
-        double diff = scrollY - this.scrollAmount;
+        double diff = scrollAmount - this.scrollAmount;
         diff = Math.signum(diff) * Math.min(Math.abs(diff), 10);
         diff *= Config.INSTANCE.scrollStrength;
         if (Math.signum(diff) != Math.signum(this.scrollStartVelocity)) diff *= 2.5d;
@@ -96,7 +96,7 @@ public abstract class AbstractScrollAreaMixin {
         method = "extractScrollbar",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V",
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V",
             ordinal = 3
         )
     )

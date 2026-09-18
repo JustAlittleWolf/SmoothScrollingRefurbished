@@ -12,30 +12,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Config {
+    public static final Config INSTANCE = new Config();
+    public static final double MAX_PUSHBACK_STRENGTH = 2.0;
     private static final Logger LOGGER = LoggerFactory.getLogger("SmoothScrollingRefurbished");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("smoothscrollingrefurbished.json");
-
-    public static final Config INSTANCE = new Config();
-
-    public static final double MAX_PUSHBACK_STRENGTH = 2.0;
-
     public double scrollStrength;
     public double scrollbarFriction;
     public double pushBackStrength;
 
     private Config() {
         this.resetToDefaults();
-    }
-
-    public boolean isPushbackDisabled() {
-        return this.pushBackStrength > Config.MAX_PUSHBACK_STRENGTH;
-    }
-
-    public void resetToDefaults() {
-        this.scrollStrength = 0.5;
-        this.scrollbarFriction = 0.025;
-        this.pushBackStrength = 1.0;
     }
 
     public static void load() {
@@ -63,5 +50,15 @@ public class Config {
         } catch (Exception e) {
             LOGGER.error("Failed to save config", e);
         }
+    }
+
+    public boolean isPushbackDisabled() {
+        return this.pushBackStrength > Config.MAX_PUSHBACK_STRENGTH;
+    }
+
+    public void resetToDefaults() {
+        this.scrollStrength = 0.5;
+        this.scrollbarFriction = 0.025;
+        this.pushBackStrength = 1.0;
     }
 }
